@@ -21,6 +21,7 @@ library(DT)
 library(plotly)
 library(leaflet)
 library(leaflet.extras)
+library(leafem)
 library(shiny)
 library(shinydashboard)
 ```
@@ -113,7 +114,7 @@ filtrarRegistros <- reactive({
       felidae_filtrado %>%
       filter(species == input$especie)
   }
-a
+
   if (input$provincia != "Todas") {
     felidae_filtrado <-
       felidae_filtrado %>%
@@ -172,8 +173,12 @@ leaflet() %>%
       ", ",
       registros$eventDate
     )
-  )
+  ) %>%
+  addSearchOSM() %>% 
+  addResetMapButton() %>%
+  addMouseCoordinates()
 })
+
 ```
 
 ### Registros de presencia
@@ -197,7 +202,7 @@ Row
 # Gráfico de estacionalidad
 renderPlotly({
   registros <- filtrarRegistros()
-felidae %>%
+registros %>%
   st_drop_geometry() %>%
   group_by(mes = format(as.Date(eventDate, "%Y-%m-%d"), "%m")) %>%
   summarize(suma_registros = n()) %>%
